@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime News</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <h2>Crime Visualization</h2>
+        </div>
+    </nav>
+
+    <div class="card">
+        <h1>Crime Distribution</h1>
+        <canvas id="crimeChart" width="400" height="200"></canvas>
+    </div>
+
+    <div class="card">
+        <h1>Crime News</h1>
+        <div class="news-container">
+            {% if articles %}
+                {% for article in articles %}
+                <div class="news-card" onclick="openModal('{{ article.title }}', '{{ article.description }}', '{{ article.url }}')">
+                    <h3>{{ article.title }}</h3>
+                    <p>{{ article.description|truncatewords:20 }}</p>
+                    <span class="crime-type {{ article.crime_type|lower }}">{{ article.crime_type }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No crime-related news found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal for full news -->
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+            <a id="modalLink" href="#" target="_blank">Read more</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Crime Visualization. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Debug: Print crime_counts data
+        const crimeLabels = JSON.parse('{{ crime_counts.keys|json_script:"crimeLabels" }}');
+        const crimeData = JSON.parse('{{ crime_counts.values|json_script:"crimeData" }}');
+
+        console.log("Crime Labels:", crimeLabels);
+        console.log("Crime Data:", crimeData);
+
+        // Chart.js for crime distribution
+        const ctx = document.getElementById('crimeChart').getContext('2d');
+        const crimeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: crimeLabels,
+                datasets: [{
+                    label: 'Number of Crimes',
+                    data: crimeData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Modal functions
+        function openModal(title, description, url) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDescription').innerText = description;
+            document.getElementById('modalLink').href = url;
+            document.getElementById('newsModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('newsModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

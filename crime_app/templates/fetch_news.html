@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime News</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <h2>Crime News</h2>
+        </div>
+    </nav>
+
+    <div class="news-container">
+        {% if articles %}
+            {% for article in articles %}
+            <div class="news-card" onclick="openModal('{{ article.title }}', '{{ article.description }}', '{{ article.url }}')">
+                <h3>{{ article.title }}</h3>
+                <p>{{ article.description|truncatewords:20 }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No crime-related news found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Modal for full news -->
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+            <a id="modalLink" href="#" target="_blank">Read more</a>
+        </div>
+    </div>
+</div>
+
+    <script>
+        function openModal(title, description, url) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDescription').innerText = description;
+            document.getElementById('modalLink').href = url;
+            document.getElementById('newsModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('newsModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
